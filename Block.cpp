@@ -18,7 +18,7 @@ Block::Block( int prevHash, string trans ) {
     this -> previousHash = prevHash;
     this -> transactions = trans;
     int contents[] = {hash_fn(trans),previousHash};
-    cout << "ContentS " << contents[1] << endl;
+    // cout << "ContentS " << contents[1] << endl;
     // this -> blockHash = hash_fn(contents.to_bytes);
     // cout << blockHash;
 
