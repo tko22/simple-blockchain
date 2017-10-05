@@ -1,8 +1,11 @@
+
 #include <iostream>
 #include <string>
-// #include "Block.cpp"
+// #include "Block.h"
 #include "hash.h"
 #include <vector>
+#include <memory>
+
 
 
 using namespace std;
@@ -19,22 +22,24 @@ void print_hex(const char *label, const uint8_t *v, size_t len) {
 
 class Block {
     public:
-        Block(string prevHas, vector<string> trans  );
+        Block(int index, string prevHas, vector<string> trans  );
         string getPreviousHash(void);
         string getHash(void);
         vector<string> getTransaction(void);
 
         void toString(void);
     private:
+        int index;
         string previousHash;
         string blockHash;
         vector<string> transactions;
         string getMerkleRoot(const vector<string> &merkle);
 };
-Block::Block( string prevHash, vector<string> trans ) {
+Block::Block(int index, string prevHash, vector<string> trans ) {
     printf("Initializing Block....\n\n");
     this -> previousHash = prevHash;
     this -> transactions = trans;
+    this -> index = index;
     string header = getMerkleRoot(trans) + previousHash;
     this -> blockHash = sha256(header);
         
@@ -87,26 +92,24 @@ string Block::getMerkleRoot(const vector<string> &merkle) {
 // }
 
 int main() {
-    string s = "Hello Bitcoin!";    
-
-    // uint8_t digest[32];
-    string digest = sha256(s);
+       
+    vector<unique_ptr<Block> > blockchain; 
 
     vector<string> v;
     string str = "hello";
     string third = "third";
     string fourth = "fourth";
+    string s = "Hello Bitcoin!"; 
     v.push_back(s);
     v.push_back(str);
     v.push_back(string("init string"));
     v.push_back(string("final string"));
 
-    string initHash = "00000000000";
-    Block genesis = Block(initHash,v);
-    cout << genesis.getHash();
-    Block b1 = Block(genesis.getHash(),v);
-    cout << b1.getHash();
+    blockchain.push_back(std::make_unique<Block>(0,string("0"),v));
+    cout << blockchain[0]->getHash();
+    // unique_ptr<Block> b1 = unique_ptr<Block>(new Block(1,*genesis.getHash(),v));
     printf("\n");
+
     return 0;
 } 
 

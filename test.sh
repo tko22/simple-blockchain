@@ -1,3 +1,3 @@
 #!/bin/sh
-g++ -Wall main.cpp -lssl -lcrypto
+g++ main.cpp -lssl -lcrypto
 ./a.out

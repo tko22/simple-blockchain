@@ -6,7 +6,7 @@ using namespace std;
 
 class Block {
     public:
-        Block(int prevHas, vector<string> trans  );
+        Block(int index, int prevHas, vector<string> trans  );
         string getPreviousHash(void);
         string getHash(void);
 
@@ -16,7 +16,7 @@ class Block {
         string blockHash;
         vector<string> transactions;
 };
-Block::Block( string prevHash, vector<string> &trans ) {
+Block::Block( int index, string prevHash, vector<string> &trans ) {
     this -> previousHash = prevHash;
     this -> transactions = trans;
 
