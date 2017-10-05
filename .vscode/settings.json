@@ -20,6 +20,11 @@
         "functional": "cpp",
         "memory": "cpp",
         "system_error": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "iterator": "cpp",
+        "__split_buffer": "cpp",
+        "utility": "cpp",
+        "sstream": "cpp",
+        "__bit_reference": "cpp"
     }
 }
