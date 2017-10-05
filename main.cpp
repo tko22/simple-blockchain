@@ -27,6 +27,7 @@ class Block {
         int previousHash;
         int blockHash;
         vector<string> transactions;
+        string getMerkleRoot;
 };
 Block::Block( int prevHash, vector<string> trans ) {
     this -> previousHash = prevHash;
@@ -48,6 +49,7 @@ void Block::toString(void) {
 }
 
 string getMerkleRoot(const vector<string> &merkle) {
+    printf("Finding Merkle Root.... \n");
     if (merkle.empty())
         return "";
     else if (merkle.size() == 1){
@@ -55,21 +57,24 @@ string getMerkleRoot(const vector<string> &merkle) {
     }
 
     vector<string> new_merkle = merkle;
-    vector<string> result;
 
     while (new_merkle.size() > 1) {
         if ( new_merkle.size() % 2 == 1 )
             new_merkle.push_back(merkle.back());
 
-        for (auto it= new_merkle.begin(); it != new_merkle.end(); it += 2){
-            string var1 = sha256(*it);
-            string var2 = sha256(*(it + 1));
-
-            result.push_back(sha256(var1 + var2));
+        vector<string> result;
+            
+        for (int i=0; i < new_merkle.size(); i += 2){
+            string var1 = sha256(new_merkle[i]);
+            string var2 = sha256(new_merkle[i+1]);
+            string hash = sha256(var1+var2);
+            printf("hash(hash(%s), hash(%s)) => %s\n",new_merkle[0].c_str(),new_merkle[1].c_str(),hash.c_str());
+            result.push_back(hash);
         }
         new_merkle = result;
     }
-    return result[0];
+    printf("\n");
+    return new_merkle[0];
 
 }
 
@@ -82,12 +87,15 @@ int main() {
 
     // uint8_t digest[32];
     string digest = sha256(s);
-    printf("\n");
 
     vector<string> v;
     string str = "hello";
+    string third = "third";
+    string fourth = "fourth";
     v.push_back(s);
     v.push_back(str);
+    v.push_back(third);
+    v.push_back(fourth);
     
     cout << getMerkleRoot(v);
     // Block b1 = Block(0,v);
