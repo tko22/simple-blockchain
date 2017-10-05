@@ -16,39 +16,43 @@ void print_hex(const char *label, const uint8_t *v, size_t len) {
     }
     printf("\n");
 }
+
 class Block {
     public:
-        Block(int prevHas, vector<string> trans  );
-        int getPreviousHash(void);
-        int getHash(void);
+        Block(string prevHas, vector<string> trans  );
+        string getPreviousHash(void);
+        string getHash(void);
+        vector<string> getTransaction(void);
 
         void toString(void);
     private:
-        int previousHash;
-        int blockHash;
+        string previousHash;
+        string blockHash;
         vector<string> transactions;
-        string getMerkleRoot;
+        string getMerkleRoot(const vector<string> &merkle);
 };
-Block::Block( int prevHash, vector<string> trans ) {
+Block::Block( string prevHash, vector<string> trans ) {
+    printf("Initializing Block....\n\n");
     this -> previousHash = prevHash;
     this -> transactions = trans;
-    // int contents[] = {hash_fn(trans),previousHash};
-    // cout << "ContentS " << contents[1] << endl;
-    // this -> blockHash = hash_fn(contents.to_bytes);
-    // cout << blockHash;
-
+    string header = getMerkleRoot(trans) + previousHash;
+    this -> blockHash = sha256(header);
+        
 }
-int Block::getPreviousHash(void) {
-    return previousHash;
+string Block::getPreviousHash(void) {
+    return this -> previousHash;
 }
-int Block::getHash(void) {
-    return blockHash;
+string Block::getHash(void) {
+    return this -> blockHash;
+}
+vector<string> Block::getTransaction(void){
+    return this -> transactions;
 }
 void Block::toString(void) {
     cout << "Block hash: " << this -> blockHash << "prevHash: " << this -> previousHash;
 }
 
-string getMerkleRoot(const vector<string> &merkle) {
+string Block::getMerkleRoot(const vector<string> &merkle) {
     printf("Finding Merkle Root.... \n");
     if (merkle.empty())
         return "";
@@ -68,7 +72,7 @@ string getMerkleRoot(const vector<string> &merkle) {
             string var1 = sha256(new_merkle[i]);
             string var2 = sha256(new_merkle[i+1]);
             string hash = sha256(var1+var2);
-            printf("hash(hash(%s), hash(%s)) => %s\n",new_merkle[0].c_str(),new_merkle[1].c_str(),hash.c_str());
+            printf("---hash(hash(%s), hash(%s)) => %s\n",new_merkle[0].c_str(),new_merkle[1].c_str(),hash.c_str());
             result.push_back(hash);
         }
         new_merkle = result;
@@ -94,11 +98,14 @@ int main() {
     string fourth = "fourth";
     v.push_back(s);
     v.push_back(str);
-    v.push_back(third);
-    v.push_back(fourth);
-    
-    cout << getMerkleRoot(v);
-    // Block b1 = Block(0,v);
+    v.push_back(string("init string"));
+    v.push_back(string("final string"));
+
+    string initHash = "00000000000";
+    Block genesis = Block(initHash,v);
+    cout << genesis.getHash();
+    Block b1 = Block(genesis.getHash(),v);
+    cout << b1.getHash();
     printf("\n");
     return 0;
 } 

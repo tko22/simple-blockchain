@@ -7,32 +7,33 @@ using namespace std;
 class Block {
     public:
         Block(int prevHas, vector<string> trans  );
-        int getPreviousHash(void);
-        int getHash(void);
+        string getPreviousHash(void);
+        string getHash(void);
 
         void toString(void);
     private:
-        int previousHash;
-        int blockHash;
+        string previousHash;
+        string blockHash;
         vector<string> transactions;
 };
-Block::Block( int prevHash, vector<string> trans ) {
+Block::Block( string prevHash, vector<string> &trans ) {
     this -> previousHash = prevHash;
     this -> transactions = trans;
-    // int contents[] = {hash_fn(trans),previousHash};
+
+    int header[] = {hash_fn(trans),previousHash};
     // cout << "ContentS " << contents[1] << endl;
     // this -> blockHash = hash_fn(contents.to_bytes);
     // cout << blockHash;
 
 }
-int Block::getPreviousHash(void) {
+string Block::getPreviousHash(void) {
     return previousHash;
 }
-int Block::getHash(void) {
+string Block::getHash(void) {
     return blockHash;
 }
 void Block::toString(void) {
-    cout << "Block hash: " << this -> blockHash << "prevHash: " << this -> previousHash;
+    cout << "Block hash: " << this -> blockHash << "\nprevHash: " << this -> previousHash;
 }
 
 string getMerkleRoot(const vector<string> &merkle) {
