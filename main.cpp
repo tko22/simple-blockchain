@@ -6,8 +6,6 @@
 #include <vector>
 #include <memory>
 
-
-
 using namespace std;
 
 void print_hex(const char *label, const uint8_t *v, size_t len) {
@@ -22,26 +20,28 @@ void print_hex(const char *label, const uint8_t *v, size_t len) {
 
 class Block {
     public:
-        Block(int index, string prevHas, vector<string> trans  );
+        Block(int index, string prevHas, string hash, string nonce, vector<string> data  );
         string getPreviousHash(void);
         string getHash(void);
-        vector<string> getTransaction(void);
+        vector<string> getData(void);
 
         void toString(void);
     private:
         int index;
         string previousHash;
         string blockHash;
-        vector<string> transactions;
-        string getMerkleRoot(const vector<string> &merkle);
+        string nonce;
+        vector<string> data;
+        // string getMerkleRoot(const vector<string> &merkle);
 };
-Block::Block(int index, string prevHash, vector<string> trans ) {
+Block::Block(int index, string prevHash, string hash, string nonce, vector<string> data ) {
     printf("Initializing Block....\n\n");
     this -> previousHash = prevHash;
-    this -> transactions = trans;
+    this -> data = data;
     this -> index = index;
-    string header = getMerkleRoot(trans) + previousHash;
-    this -> blockHash = sha256(header);
+    this -> nonce = nonce;
+    // string header = getMerkleRoot(data) + previousHash;
+    this -> blockHash = hash;
         
 }
 string Block::getPreviousHash(void) {
@@ -50,14 +50,14 @@ string Block::getPreviousHash(void) {
 string Block::getHash(void) {
     return this -> blockHash;
 }
-vector<string> Block::getTransaction(void){
-    return this -> transactions;
+vector<string> Block::getData(void){
+    return this -> data;
 }
 void Block::toString(void) {
     cout << "Block hash: " << this -> blockHash << "prevHash: " << this -> previousHash;
 }
 
-string Block::getMerkleRoot(const vector<string> &merkle) {
+string getMerkleRoot(const vector<string> &merkle) {
     printf("Finding Merkle Root.... \n");
     if (merkle.empty())
         return "";
@@ -87,10 +87,6 @@ string Block::getMerkleRoot(const vector<string> &merkle) {
 
 }
 
-// string Block::getTransactions(void)  {
-//     return Block::transactions;
-// }
-
 int main() {
        
     vector<unique_ptr<Block> > blockchain; 
@@ -104,9 +100,11 @@ int main() {
     v.push_back(str);
     v.push_back(string("init string"));
     v.push_back(string("final string"));
-
-    blockchain.push_back(std::make_unique<Block>(0,string("0"),v));
+    string header = to_string(0) + getMerkleRoot(v) + to_string(0); // index + merkle root + previous hash
+    string nonce = "0000";
+    blockchain.push_back(std::make_unique<Block>(0,string("0"),sha256(header),nonce,v));
     cout << blockchain[0]->getHash();
+    
     // unique_ptr<Block> b1 = unique_ptr<Block>(new Block(1,*genesis.getHash(),v));
     printf("\n");
 
