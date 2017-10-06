@@ -7,7 +7,9 @@
 #include <stdexcept>
 
 using namespace std;
-
+/*
+Hash header: index + prevHash + merkleRoot(data) + nonce
+*/
 void print_hex(const char *label, const uint8_t *v, size_t len) {
     size_t i;
 
@@ -35,7 +37,7 @@ class Block {
         // string getMerkleRoot(const vector<string> &merkle);
 };
 Block::Block(int index, string prevHash, string hash, string nonce, vector<string> data ) {
-    printf("Initializing Block: %d ---- Hash: %s ", index,hash.c_str());
+    printf("\nInitializing Block: %d ---- Hash: %s \n", index,hash.c_str());
     this -> previousHash = prevHash;
     this -> data = data;
     this -> index = index;
@@ -60,7 +62,7 @@ void Block::toString(void) {
 }
 
 string getMerkleRoot(const vector<string> &merkle) {
-    printf("Finding Merkle Root.... \n");
+    printf("\nFinding Merkle Root.... \n");
     if (merkle.empty())
         return "";
     else if (merkle.size() == 1){
@@ -88,9 +90,10 @@ string getMerkleRoot(const vector<string> &merkle) {
 
 }
 pair<string,string> findHash(string header) {
+    
     unsigned int nonce;
     for (nonce = 0; nonce < 100000; nonce++ ) {
-
+        
         string blockHash = sha256(header + to_string(nonce));
         if (blockHash.substr(0,2) == "00"){
             return make_pair(blockHash,to_string(nonce));
@@ -99,20 +102,20 @@ pair<string,string> findHash(string header) {
     }
     return make_pair("fail","fail");
 }
-int addBlock(int index, string prevHash, vector<string> &merkle, vector<unique_ptr<Block> > &blockchain) {
-    string header = to_string(index) + prevHash + getMerkleRoot(merkle);
-    auto pair = findHash(header);
+// int addBlock(int index, string prevHash, vector<string> &merkle, vector<unique_ptr<Block> > &blockchain) {
+//     string header = to_string(index) + prevHash + getMerkleRoot(merkle);
+//     auto pair = findHash(header);
     
-    blockchain.push_back(std::make_unique<Block>(index,prevHash,pair.first,pair.second,merkle));
-    return 1;
-}
+//     blockchain.push_back(std::make_unique<Block>(index,prevHash,pair.first,pair.second,merkle));
+//     return 1;
+// }
 class BlockChain {
     public:
         BlockChain();
         Block getBlock(int index);
         // getBlock(string hash); //not implemented
         int getNumOfBlocks(void);
-        int addBlock(void);
+        int addBlock(int index, string prevHash, string hash, string nonce, vector<string> &merkle);
         void toString(void);
     private:
         vector<unique_ptr<Block> > blockchain;
@@ -123,7 +126,7 @@ BlockChain::BlockChain(){
     v.push_back("Genesis Block!");
     string header = to_string(0) + string("00000000000000") + getMerkleRoot(v);
     auto hash_nonce_pair = findHash(header);
-
+    
     this -> blockchain.push_back(std::make_unique<Block>(0,string("00000000000000"),hash_nonce_pair.first,hash_nonce_pair.second,v));
     printf("Created blockchain!\n");
 }
@@ -138,13 +141,31 @@ Block BlockChain::getBlock(int index) {
 int BlockChain::getNumOfBlocks(void) {
     return this -> blockchain.size();
 }
+int BlockChain::addBlock(int index, string prevHash, string hash, string nonce, vector<string> &merkle) {
+    string header = to_string(index) + prevHash + getMerkleRoot(merkle) + nonce;
+    
+    if ( (!sha256(header).compare(hash)) && (hash.substr(0,2) == "00" )) {
+        printf("\nBlock hashes match --- Adding Block %s \n",hash.c_str());
+        this->blockchain.push_back(std::make_unique<Block>(index,prevHash,hash,nonce,merkle));
+        return 1;
+    }
+    cout << "\nHash doesn't match criteria";
+    return 0;
+}
 int main() {
+    printf("Welcome!\n");
+    char tmp[201];
 
     auto bc = BlockChain();
-    printf("Blockchains!!! Enter your message:");
-    cout << bc.getBlock(0).getHash();
+    vector<string> v;
     
 
+    printf("Enter your message:");
+    scanf("%200s",tmp);
+    string str = tmp;
+    printf("Entered '%s' into block\n",str.c_str());
+    // bc.addBlock(0,string("00000000000000"),string("003d9dc40cad6b414d45555e4b83045cfde74bcee6b09fb42536ca2500087fd9"),string("46"),v);
+    v.push_back(str);
     printf("\n");
     return 0;
 } 
