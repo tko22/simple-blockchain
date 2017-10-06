@@ -10,7 +10,7 @@
 
 class BlockChain {
 public:
-    BlockChain();
+    BlockChain(int genesis);
     Block getBlock(int index);
     // getBlock(string hash); //not implemented
     int getNumOfBlocks(void);
@@ -21,14 +21,18 @@ private:
     vector<unique_ptr<Block> > blockchain;
 };
 
-BlockChain::BlockChain(){
-    vector<string> v;
-    v.push_back("Genesis Block!");
-    // string header = to_string(0) + string("00000000000000") + getMerkleRoot(v);
-    auto hash_nonce_pair = findHash(0,string("00000000000000"),v);
-
-    this -> blockchain.push_back(std::make_unique<Block>(0,string("00000000000000"),hash_nonce_pair.first,hash_nonce_pair.second,v));
-    printf("Created blockchain!\n");
+// If integer passed into constructor is 0, it the first node and creates the genesis block
+BlockChain::BlockChain(int genesis){
+    if (genesis == 0) {
+        vector<string> v;
+        v.push_back("Genesis Block!");
+        // string header = to_string(0) + string("00000000000000") + getMerkleRoot(v);
+        auto hash_nonce_pair = findHash(0,string("00000000000000"),v);
+    
+        this -> blockchain.push_back(std::make_unique<Block>(0,string("00000000000000"),hash_nonce_pair.first,hash_nonce_pair.second,v));
+        printf("Created blockchain!\n");
+    }
+    
 }
 
 Block BlockChain::getBlock(int index) {

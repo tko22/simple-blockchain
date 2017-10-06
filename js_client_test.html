@@ -8,7 +8,7 @@
 <script>
     var ws;
     window.onload=function(){
-        ws=new WebSocket("ws://localhost:8000/echo");
+        ws=new WebSocket("ws://localhost:8000/blockchain");
         ws.onmessage=function(evt){console.log(evt.data);};
         ws.onopen=function(evt){
             ws.send("Hello");
