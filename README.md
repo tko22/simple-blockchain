@@ -1,9 +1,12 @@
 # simple-blockchain
 My implementation of a blockchain in C++ I created for fun :)
 Follows some Bitcoin design choices including using SHA-256 to hash headers and blocks, merkle trees, and mining WoS. 
+- Uses C++14 and OpenSSL library
+
+### Peer-to-Peer coming soon!
 
 Includes a Command line interface that allows you to view blockchains at different indices and add new blocks. You 
-can do that 20 times until it automatically quits -> can change that. 
+can do that 20 times until it automatically quits -> can change that. You can control-c to quit too. 
 
 And unfortunately, everything is stored in memory and is deleted on quit.
 
@@ -42,11 +45,11 @@ Hash header: index + prevHash + merkleRoot(data) + nonce
 ## Common Functions
 #### getMerkleRoot(const vector<string> &merkle)
   - gets merkle root based on elements of a vector
-#### findHasH(int index, string prevHash, vector<string> &merkle)
+#### findHash(int index, string prevHash, vector<string> &merkle)
   - "Mining" part 
   - finds hash and returns a std::pair of the hash found and nonce used to find it 
 
 
 
-## Peer-to-Peer coming soon!
+
 tk2@illinois.edu
