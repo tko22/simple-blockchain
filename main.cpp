@@ -17,10 +17,9 @@ void print_hex(const char *label, const uint8_t *v, size_t len) {
     }
     printf("\n");
 }
-
 class Block {
     public:
-        Block(int index, string prevHas, string hash, string nonce, vector<string> data  );
+        Block(int index, string prevHas, string hash, string nonce, vector<string> data);
         string getPreviousHash(void);
         string getHash(void);
         int getIndex(void);
@@ -118,13 +117,14 @@ class BlockChain {
     private:
         vector<unique_ptr<Block> > blockchain;
 };
+
 BlockChain::BlockChain(){
     vector<string> v;
     v.push_back("Genesis Block!");
-    string header = string(0) + string("00000000000000") + getMerkleRoot(v);
+    string header = to_string(0) + string("00000000000000") + getMerkleRoot(v);
     auto hash_nonce_pair = findHash(header);
 
-    this -> blockchain.push_back(std::make_unique<Block>(index,string("00000000000000"),hash_nonce_pair.first,hash_nonce_pair.second,v));
+    this -> blockchain.push_back(std::make_unique<Block>(0,string("00000000000000"),hash_nonce_pair.first,hash_nonce_pair.second,v));
     printf("Created blockchain!\n");
 }
 Block BlockChain::getBlock(int index) {
@@ -135,14 +135,14 @@ Block BlockChain::getBlock(int index) {
     }
     throw invalid_argument("Index does not exist.");
 }
+int BlockChain::getNumOfBlocks(void) {
+    return this -> blockchain.size();
+}
 int main() {
-    vector<unique_ptr<Block> > blockchain; 
 
-    BlockChain();
+    auto bc = BlockChain();
     printf("Blockchains!!! Enter your message:");
-
-
-    
+    cout << bc.getBlock(0).getHash();
     
 
     printf("\n");
