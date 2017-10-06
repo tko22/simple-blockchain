@@ -2,13 +2,14 @@
 My implementation of a blockchain in C++ I created for fun :)
 Follows some Bitcoin design choices including using SHA-256 to hash headers and blocks, merkle trees, and mining WoS. 
 
-Includes a Command line interface that allows you to view blockchains at different indices and add new blocks.
+Includes a Command line interface that allows you to view blockchains at different indices and add new blocks. You 
+can do that 20 times until it automatically quits -> can change that. 
 
-### BlockChain Class
+And unfortunately, everything is stored in memory and is deleted on quit.
+
+## BlockChain Class
+Genesis Block is created during intialization.
 Every time you want to add a block to the blockchain, you will need to provide it: 
-
-#### Private Variables: 
-- blockchain(vector<unique_ptr<Block> >): vector of smart pointers to Block objects
 
 `int index, string prevHash, string hash, string nonce, vector<string> &merkle`
 - index: index of the block
@@ -16,14 +17,19 @@ Every time you want to add a block to the blockchain, you will need to provide i
 - nonce: self-explantory
 - merkle: vector holding in the data of the block
 
-### Mining
+It will then check whether you have the correct hash(it rehashes it), if you have "00" in front, and whether your index is correct.
+
+#### Private Variables: 
+- blockchain(vector<unique_ptr<Block> >): vector of smart pointers to Block objects
+
+## Mining
 (I made it very simple because I didn't want to spend much processing power)
 
 first two characters of the hash must be 0
 - e.g. `003d9dc40cad6b414d45555e4b83045cfde74bcee6b09fb42536ca2500087fd9` works 
 
 
-### Block 
+## Block 
 Hash header: index + prevHash + merkleRoot(data) + nonce
 
 #### Private Variables:
@@ -33,4 +39,14 @@ Hash header: index + prevHash + merkleRoot(data) + nonce
 - blockHash
 - nonce
 
-### Peer-to-Peer coming soon!
+## Common Functions
+#### getMerkleRoot(const vector<string> &merkle)
+  - gets merkle root based on elements of a vector
+#### findHasH(int index, string prevHash, vector<string> &merkle)
+  - "Mining" part 
+  - finds hash and returns a std::pair of the hash found and nonce used to find it 
+
+
+
+## Peer-to-Peer coming soon!
+tk2@illinois.edu
