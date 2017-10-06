@@ -60,3 +60,5 @@ void Block::toString(void) {
         index,this->blockHash.c_str(),this->previousHash.c_str(),dataString.c_str());
     printf("\n-------------------------------\n");
 }
+
+#endif

@@ -66,3 +66,4 @@ pair<string,string> findHash(int index, string prevHash, vector<string> &merkle)
 //     blockchain.push_back(std::make_unique<Block>(index,prevHash,pair.first,pair.second,merkle));
 //     return 1;
 // }
+#endif
