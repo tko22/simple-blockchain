@@ -1,10 +1,10 @@
-
 #include <iostream>
 #include <string>
 // #include "Block.h"
 #include "hash.h"
 #include <vector>
 #include <memory>
+#include <stdexcept>
 
 using namespace std;
 
@@ -121,11 +121,10 @@ class BlockChain {
 BlockChain::BlockChain(){
     vector<string> v;
     v.push_back("Genesis Block!");
-    string merkle = getMerkleRoot(v);
-    string header = string(0) + string("00000000000000") + merkle;
+    string header = string(0) + string("00000000000000") + getMerkleRoot(v);
     auto hash_nonce_pair = findHash(header);
 
-    this -> blockchain.push_back(std::make_unique<Block>(index,string("00000000000000"),hash_nonce_pair.first,hash_nonce_pair.second,merkle));
+    this -> blockchain.push_back(std::make_unique<Block>(index,string("00000000000000"),hash_nonce_pair.first,hash_nonce_pair.second,v));
     printf("Created blockchain!\n");
 }
 Block BlockChain::getBlock(int index) {
@@ -134,6 +133,7 @@ Block BlockChain::getBlock(int index) {
             return *(blockchain[i]);
         }
     }
+    throw invalid_argument("Index does not exist.");
 }
 int main() {
     vector<unique_ptr<Block> > blockchain; 
