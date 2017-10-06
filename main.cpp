@@ -58,7 +58,14 @@ vector<string> Block::getData(void){
     return this -> data;
 }
 void Block::toString(void) {
-    cout << "Block hash: " << this -> blockHash << "prevHash: " << this -> previousHash;
+    string dataString;
+    for (int i=0; i < data.size(); i++)
+        dataString = data[i];
+    printf("\n-------------------------------\n");
+    printf("Block %d\nHash: %s\nPrevious Hash: %s\nContents: %s",
+        index,this->blockHash.c_str(),this->previousHash.c_str(),dataString.c_str());
+    printf("\n-------------------------------\n");
+    
 }
 
 string getMerkleRoot(const vector<string> &merkle) {
@@ -95,8 +102,8 @@ pair<string,string> findHash(int index, string prevHash, vector<string> &merkle)
     for (nonce = 0; nonce < 100000; nonce++ ) {
         string blockHash = sha256(header + to_string(nonce));
         if (blockHash.substr(0,2) == "00"){
-            cout << "nonce: " << nonce;
-            cout << "header: " << header;
+            // cout << "nonce: " << nonce;
+            // cout << "header: " << header;
             return make_pair(blockHash,to_string(nonce));
             break;
         }
@@ -158,27 +165,41 @@ string BlockChain::getLatestBlockHash(void) {
     return this->blockchain[blockchain.size()-1]->getHash();
 }
 int main() {
-    printf("Welcome!\n");
+    printf("Welcome! To quit-> Control c \n");
     char tmp[201];
-    char ch;
+    int ch;
     auto bc = BlockChain();
-    vector<string> v;
+    for ( int i = 0; i < 10; i++ ) {
+        vector<string> v;
+        int temp;
+        printf("(1) Look at Blocks \n(2) Add block\n");
+        scanf("%d",&temp);
+        if (temp == 1){
+            printf("What Block do you want to look at? ");
+            scanf("%d",&temp);
+            try {
+                bc.getBlock(temp).toString();
+            }
+            catch (const exception& e){
+                cout << e.what() << "\n";
+            }
+        }
+        else{
+            printf("\nADDING BLOCKS!\nEnter your message: ");
+            scanf("%200s",tmp);
+            string str = tmp;
+            printf("Entered '%s' into block\n",str.c_str());
+            v.push_back(str);
+        
+            printf("Press any number to add block to blockchain:");
+            scanf("%d",&ch);
+        
+            auto pair = findHash(bc.getNumOfBlocks(),bc.getLatestBlockHash(),v);
+            bc.addBlock(bc.getNumOfBlocks(),bc.getLatestBlockHash(),pair.first,pair.second,v );
+        }
+    }
+        
     
-
-    printf("Enter your message:");
-    scanf("%200s",tmp);
-    string str = tmp;
-    printf("Entered '%s' into block\n",str.c_str());
-    v.push_back(str);
-
-    printf("Press any key to add block to blockchain:");
-    scanf("%c",&ch);
-
-    auto pair = findHash(bc.getNumOfBlocks(),bc.getLatestBlockHash(),v);
-    bc.addBlock(bc.getNumOfBlocks(),bc.getLatestBlockHash(),pair.first,pair.second,v );
-    
-
-
 
     // bc.addBlock(0,string("00000000000000"),string("003d9dc40cad6b414d45555e4b83045cfde74bcee6b09fb42536ca2500087fd9"),string("46"),v);
     printf("\n");
