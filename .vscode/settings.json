@@ -25,6 +25,7 @@
         "__split_buffer": "cpp",
         "utility": "cpp",
         "sstream": "cpp",
-        "__bit_reference": "cpp"
+        "__bit_reference": "cpp",
+        "ios": "cpp"
     }
 }

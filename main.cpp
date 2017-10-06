@@ -23,6 +23,7 @@ class Block {
         Block(int index, string prevHas, string hash, string nonce, vector<string> data  );
         string getPreviousHash(void);
         string getHash(void);
+        int getIndex(void);
         vector<string> getData(void);
 
         void toString(void);
@@ -35,14 +36,16 @@ class Block {
         // string getMerkleRoot(const vector<string> &merkle);
 };
 Block::Block(int index, string prevHash, string hash, string nonce, vector<string> data ) {
-    printf("Initializing Block....\n\n");
+    printf("Initializing Block: %d ---- Hash: %s ", index,hash.c_str());
     this -> previousHash = prevHash;
     this -> data = data;
     this -> index = index;
     this -> nonce = nonce;
-    // string header = getMerkleRoot(data) + previousHash;
     this -> blockHash = hash;
         
+}
+int Block::getIndex(void) {
+    return this -> index;
 }
 string Block::getPreviousHash(void) {
     return this -> previousHash;
@@ -77,37 +80,72 @@ string getMerkleRoot(const vector<string> &merkle) {
             string var1 = sha256(new_merkle[i]);
             string var2 = sha256(new_merkle[i+1]);
             string hash = sha256(var1+var2);
-            printf("---hash(hash(%s), hash(%s)) => %s\n",new_merkle[0].c_str(),new_merkle[1].c_str(),hash.c_str());
+            // printf("---hash(hash(%s), hash(%s)) => %s\n",new_merkle[0].c_str(),new_merkle[1].c_str(),hash.c_str());
             result.push_back(hash);
         }
         new_merkle = result;
     }
-    printf("\n");
     return new_merkle[0];
 
 }
+pair<string,string> findHash(string header) {
+    unsigned int nonce;
+    for (nonce = 0; nonce < 100000; nonce++ ) {
 
+        string blockHash = sha256(header + to_string(nonce));
+        if (blockHash.substr(0,2) == "00"){
+            return make_pair(blockHash,to_string(nonce));
+            break;
+        }
+    }
+    return make_pair("fail","fail");
+}
+int addBlock(int index, string prevHash, vector<string> &merkle, vector<unique_ptr<Block> > &blockchain) {
+    string header = to_string(index) + prevHash + getMerkleRoot(merkle);
+    auto pair = findHash(header);
+    
+    blockchain.push_back(std::make_unique<Block>(index,prevHash,pair.first,pair.second,merkle));
+    return 1;
+}
+class BlockChain {
+    public:
+        BlockChain();
+        Block getBlock(int index);
+        // getBlock(string hash); //not implemented
+        int getNumOfBlocks(void);
+        int addBlock(void);
+        void toString(void);
+    private:
+        vector<unique_ptr<Block> > blockchain;
+};
+BlockChain::BlockChain(){
+    vector<string> v;
+    v.push_back("Genesis Block!");
+    string merkle = getMerkleRoot(v);
+    string header = string(0) + string("00000000000000") + merkle;
+    auto hash_nonce_pair = findHash(header);
+
+    this -> blockchain.push_back(std::make_unique<Block>(index,string("00000000000000"),hash_nonce_pair.first,hash_nonce_pair.second,merkle));
+    printf("Created blockchain!\n");
+}
+Block BlockChain::getBlock(int index) {
+    for ( int i = 0; i <blockchain.size(); i++ ){
+        if (blockchain[i]->getIndex() == index) {
+            return *(blockchain[i]);
+        }
+    }
+}
 int main() {
-       
     vector<unique_ptr<Block> > blockchain; 
 
-    vector<string> v;
-    string str = "hello";
-    string third = "third";
-    string fourth = "fourth";
-    string s = "Hello Bitcoin!"; 
-    v.push_back(s);
-    v.push_back(str);
-    v.push_back(string("init string"));
-    v.push_back(string("final string"));
-    string header = to_string(0) + getMerkleRoot(v) + to_string(0); // index + merkle root + previous hash
-    string nonce = "0000";
-    blockchain.push_back(std::make_unique<Block>(0,string("0"),sha256(header),nonce,v));
-    cout << blockchain[0]->getHash();
-    
-    // unique_ptr<Block> b1 = unique_ptr<Block>(new Block(1,*genesis.getHash(),v));
-    printf("\n");
+    BlockChain();
+    printf("Blockchains!!! Enter your message:");
 
+
+    
+    
+
+    printf("\n");
     return 0;
 } 
 
