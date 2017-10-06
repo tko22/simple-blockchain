@@ -4,12 +4,13 @@
 #include <memory>
 #include <stdexcept>
 
-
 #include "hash.h"
 #include "Block.h"
 #include "common.h"
 #include "BlockChain.h"
 
+#include "client_ws.hpp"
+#include "server_ws.hpp"
 
 using namespace std;
 /*
