@@ -16,10 +16,6 @@ using namespace std;
 Hash header: index + prevHash + merkleRoot(data) + nonce
 */
 
-
-
-
-
 int main() {
     printf("Welcome! To quit-> Control c \n");
     char tmp[201];
@@ -47,7 +43,7 @@ int main() {
             printf("Entered '%s' into block\n",str.c_str());
             v.push_back(str);
         
-            printf("Press any number to add block to blockchain:");
+            printf("Press any number to add block to blockchain: ");
             scanf("%d",&ch);
         
             auto pair = findHash(bc.getNumOfBlocks(),bc.getLatestBlockHash(),v);
