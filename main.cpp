@@ -21,10 +21,10 @@ int main() {
     char tmp[201];
     int ch;
     auto bc = BlockChain();
-    for ( int i = 0; i < 10; i++ ) {
+    for ( int i = 0; i < 20; i++ ) {
         vector<string> v;
         int temp;
-        printf("(1) Look at Blocks \n(2) Add block\n");
+        printf("\n(1) Look at Blocks \n(2) Add block\n");
         scanf("%d",&temp);
         if (temp == 1){
             printf("What Block do you want to look at? ");

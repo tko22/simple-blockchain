@@ -30,6 +30,7 @@ BlockChain::BlockChain(){
     this -> blockchain.push_back(std::make_unique<Block>(0,string("00000000000000"),hash_nonce_pair.first,hash_nonce_pair.second,v));
     printf("Created blockchain!\n");
 }
+
 Block BlockChain::getBlock(int index) {
     for ( int i = 0; i <blockchain.size(); i++ ){
         if (blockchain[i]->getIndex() == index) {
@@ -38,20 +39,23 @@ Block BlockChain::getBlock(int index) {
     }
     throw invalid_argument("Index does not exist.");
 }
+
 int BlockChain::getNumOfBlocks(void) {
     return this -> blockchain.size();
 }
+
 int BlockChain::addBlock(int index, string prevHash, string hash, string nonce, vector<string> &merkle) {
     string header = to_string(index) + prevHash + getMerkleRoot(merkle) + nonce;
     cout << header;
-    if ( (!sha256(header).compare(hash)) && (hash.substr(0,2) == "00" )) {
+    if ( (!sha256(header).compare(hash)) && (hash.substr(0,2) == "00" ) && (index == blockchain.size())) {
         printf("\nBlock hashes match --- Adding Block %s \n",hash.c_str());
         this->blockchain.push_back(std::make_unique<Block>(index,prevHash,hash,nonce,merkle));
         return 1;
     }
-    cout << "\nHash doesn't match criteria";
+    cout << "\nHash doesn't match criteria\n";
     return 0;
 }
+
 string BlockChain::getLatestBlockHash(void) {
     return this->blockchain[blockchain.size()-1]->getHash();
 }
