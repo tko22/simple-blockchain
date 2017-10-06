@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <string>
-#include "hash.h"
 #include <vector>
 #include <memory>
 #include <stdexcept>
