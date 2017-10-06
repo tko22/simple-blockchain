@@ -25,8 +25,8 @@ int main() {
     WsServer server;
     int port;
     printf("Enter port: ");
-    scanf("%d",port); 
-    server.config.port = 8000;
+    scanf("%d",&port); 
+    server.config.port = port;
     
     auto &echo = server.endpoint["^/blockchain/?$"];
     
@@ -76,14 +76,17 @@ int main() {
     // BLOCK CHAIN INITIALIZATION
     
     char ch;
-    printf("Are you the initial Node? (y or n)");
-    scanf("%c",&ch);
-    if (ch == "y"){
-        
+    printf("Are you the initial Node? (y or n) ");
+    scanf(" %c",&ch);
+    BlockChain bc;
+    if (ch == 'y'){
+        bc = BlockChain(0);
+    }
+    else {
+        bc = BlockChain();
     }
     char tmp[201];
     int in;
-    auto bc = BlockChain();
     for ( int i = 0; i < 20; i++ ) {
         vector<string> v;
         int temp;
