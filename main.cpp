@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-// #include "Block.h"
+#include "Block.h"
 #include "hash.h"
 #include <vector>
 #include <memory>
@@ -10,63 +10,8 @@ using namespace std;
 /*
 Hash header: index + prevHash + merkleRoot(data) + nonce
 */
-void print_hex(const char *label, const uint8_t *v, size_t len) {
-    size_t i;
 
-    printf("%s: ", label);
-    for (i = 0; i < len; ++i) {
-        printf("%02x", v[i]);
-    }
-    printf("\n");
-}
-class Block {
-    public:
-        Block(int index, string prevHas, string hash, string nonce, vector<string> data);
-        string getPreviousHash(void);
-        string getHash(void);
-        int getIndex(void);
-        vector<string> getData(void);
 
-        void toString(void);
-    private:
-        int index;
-        string previousHash;
-        string blockHash;
-        string nonce;
-        vector<string> data;
-        // string getMerkleRoot(const vector<string> &merkle);
-};
-Block::Block(int index, string prevHash, string hash, string nonce, vector<string> data ) {
-    printf("\nInitializing Block: %d ---- Hash: %s \n", index,hash.c_str());
-    this -> previousHash = prevHash;
-    this -> data = data;
-    this -> index = index;
-    this -> nonce = nonce;
-    this -> blockHash = hash;
-        
-}
-int Block::getIndex(void) {
-    return this -> index;
-}
-string Block::getPreviousHash(void) {
-    return this -> previousHash;
-}
-string Block::getHash(void) {
-    return this -> blockHash;
-}
-vector<string> Block::getData(void){
-    return this -> data;
-}
-void Block::toString(void) {
-    string dataString;
-    for (int i=0; i < data.size(); i++)
-        dataString = data[i];
-    printf("\n-------------------------------\n");
-    printf("Block %d\nHash: %s\nPrevious Hash: %s\nContents: %s",
-        index,this->blockHash.c_str(),this->previousHash.c_str(),dataString.c_str());
-    printf("\n-------------------------------\n");
-    
-}
 
 string getMerkleRoot(const vector<string> &merkle) {
     printf("\nFinding Merkle Root.... \n");
