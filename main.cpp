@@ -89,13 +89,14 @@ string getMerkleRoot(const vector<string> &merkle) {
     return new_merkle[0];
 
 }
-pair<string,string> findHash(string header) {
-    
+pair<string,string> findHash(int index, string prevHash, vector<string> &merkle) {
+    string header = to_string(index) + prevHash + getMerkleRoot(merkle);
     unsigned int nonce;
     for (nonce = 0; nonce < 100000; nonce++ ) {
-        
         string blockHash = sha256(header + to_string(nonce));
         if (blockHash.substr(0,2) == "00"){
+            cout << "nonce: " << nonce;
+            cout << "header: " << header;
             return make_pair(blockHash,to_string(nonce));
             break;
         }
@@ -116,6 +117,7 @@ class BlockChain {
         // getBlock(string hash); //not implemented
         int getNumOfBlocks(void);
         int addBlock(int index, string prevHash, string hash, string nonce, vector<string> &merkle);
+        string getLatestBlockHash(void);
         void toString(void);
     private:
         vector<unique_ptr<Block> > blockchain;
@@ -124,8 +126,8 @@ class BlockChain {
 BlockChain::BlockChain(){
     vector<string> v;
     v.push_back("Genesis Block!");
-    string header = to_string(0) + string("00000000000000") + getMerkleRoot(v);
-    auto hash_nonce_pair = findHash(header);
+    // string header = to_string(0) + string("00000000000000") + getMerkleRoot(v);
+    auto hash_nonce_pair = findHash(0,string("00000000000000"),v);
     
     this -> blockchain.push_back(std::make_unique<Block>(0,string("00000000000000"),hash_nonce_pair.first,hash_nonce_pair.second,v));
     printf("Created blockchain!\n");
@@ -143,7 +145,7 @@ int BlockChain::getNumOfBlocks(void) {
 }
 int BlockChain::addBlock(int index, string prevHash, string hash, string nonce, vector<string> &merkle) {
     string header = to_string(index) + prevHash + getMerkleRoot(merkle) + nonce;
-    
+    cout << header;
     if ( (!sha256(header).compare(hash)) && (hash.substr(0,2) == "00" )) {
         printf("\nBlock hashes match --- Adding Block %s \n",hash.c_str());
         this->blockchain.push_back(std::make_unique<Block>(index,prevHash,hash,nonce,merkle));
@@ -152,10 +154,13 @@ int BlockChain::addBlock(int index, string prevHash, string hash, string nonce, 
     cout << "\nHash doesn't match criteria";
     return 0;
 }
+string BlockChain::getLatestBlockHash(void) {
+    return this->blockchain[blockchain.size()-1]->getHash();
+}
 int main() {
     printf("Welcome!\n");
     char tmp[201];
-
+    char ch;
     auto bc = BlockChain();
     vector<string> v;
     
@@ -164,8 +169,18 @@ int main() {
     scanf("%200s",tmp);
     string str = tmp;
     printf("Entered '%s' into block\n",str.c_str());
-    // bc.addBlock(0,string("00000000000000"),string("003d9dc40cad6b414d45555e4b83045cfde74bcee6b09fb42536ca2500087fd9"),string("46"),v);
     v.push_back(str);
+
+    printf("Press any key to add block to blockchain:");
+    scanf("%c",&ch);
+
+    auto pair = findHash(bc.getNumOfBlocks(),bc.getLatestBlockHash(),v);
+    bc.addBlock(bc.getNumOfBlocks(),bc.getLatestBlockHash(),pair.first,pair.second,v );
+    
+
+
+
+    // bc.addBlock(0,string("00000000000000"),string("003d9dc40cad6b414d45555e4b83045cfde74bcee6b09fb42536ca2500087fd9"),string("46"),v);
     printf("\n");
     return 0;
 } 
