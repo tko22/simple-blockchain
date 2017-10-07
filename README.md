@@ -25,7 +25,7 @@ So if some other node sends in a new chain that's longer than yours, your chain 
 
 **Note:** this was a simple implementation and thus, it replaces the entire chain except for the genesis block. For future improvements, each node should check the new chain with other nodes before it is added and entire nodes shouldn't be sent out. 
 
-## BlockChain Class
+## BlockChain Object
 #### Private Variables: 
 - blockchain(vector<unique_ptr<Block> >): vector of smart pointers to Block objects
 
@@ -49,7 +49,7 @@ Note: this is the only way to add to the blockchain.
 first two characters of the hash must be 0
 - e.g. `003d9dc40cad6b414d45555e4b83045cfde74bcee6b09fb42536ca2500087fd9` works 
 
-## Block 
+## Block Object
 Hash header: index + prevHash + merkleRoot(data) + nonce
 
 #### Private Variables:
