@@ -21,6 +21,7 @@ public:
     string getLatestBlockHash(void);
     // void toString(void);
     string toJSON(void);
+    int replaceChain(json chain);
 private:
     vector<unique_ptr<Block> > blockchain;
 };
@@ -73,6 +74,19 @@ string BlockChain::toJSON() {
         j["data"][this->blockchain[i]->getIndex()] = this->blockchain[i]->toJSON();
     }
     return j.dump(3);
+}
+
+int BlockChain::replaceChain(json chain) {
+    //remove all blocks except for the first block
+    while (this->blockchain.size() > 1){
+        this->blockchain.pop_back();
+    }
+    for (int a = 1; a <chain["length"].get<int>(); a++ ){
+        auto block = chain["data"][a];
+        vector<string> data = block["data"].get<vector<string> >();
+        this->addBlock(block["index"],block["previousHash"],block["hash"],block["nonce"],data);
+    } 
+    return 1;
 }
 
 #endif
