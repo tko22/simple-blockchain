@@ -1,6 +1,6 @@
 # simple-blockchain
 My implementation of a blockchain in C++ I created for fun :)
-Follows some Bitcoin design principles including a peer-to-peer network, SHA-256 to hash headers and blocks, merkle trees, and mining WoS. 
+Follows some Bitcoin design principles including a peer-to-peer network, SHA-256 to hash headers and blocks, merkle trees, and "mining"(more on that below). 
 #### Requirements
 - Uses C++14, OpenSSL library, Simple-Web-Server, and a [JSON library](https://github.com/nlohmann/json)
 
@@ -42,8 +42,8 @@ It will then check whether you have the correct hash(it rehashes the information
 
 Note: this is the only way to add to the blockchain.
 
-## Mining
-(I made it very simple because I didn't want to spend much processing power) - use findHash() to get hash and nonce
+## Mining for I guess... Proof of Stake
+(I made it very simple because I didn't want to spend much processing power so it's honestly not proof of stake but I just added it in for fun) - use findHash() to get hash and nonce
 
 first two characters of the hash must be 0
 - e.g. `003d9dc40cad6b414d45555e4b83045cfde74bcee6b09fb42536ca2500087fd9` works 
