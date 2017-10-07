@@ -61,7 +61,7 @@ void sendNewChain(const vector<int> *listOfNodes, string json){
         HttpClient client("localhost:"+to_string(port));
         try {
             auto req = client.request("POST", "/newchain",json);
-            cout << "Node " << Port << " Reponse: " << req->content.string() << endl;
+            cout << "Node " << port << " Reponse: " << req->content.string() << endl;
         }
         catch(const SimpleWeb::system_error &e) {
             cerr << "Client request error: " << e.what() << endl;
