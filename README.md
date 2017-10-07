@@ -5,7 +5,7 @@ Follows some Bitcoin design principles including a peer-to-peer network, SHA-256
 - Uses C++14, OpenSSL library, Simple-Web-Server, and a [JSON library](https://github.com/nlohmann/json)
 
 Includes a Command line interface that allows you to view blockchains at different indices and add new blocks. You 
-can do that 20 times until it automatically quits -> you can change that. Control-c to quit. 
+can do that 20 times until it automatically quits but you can change that. Control-c to quit. 
 
 And unfortunately, everything is stored in memory and is deleted when program quits.
 
