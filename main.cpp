@@ -29,6 +29,7 @@ json getChainFromNodes(const vector<int> *listOfNodes){
     vector<string> vect;
     for ( int a = 0; a < (*listOfNodes).size(); a++ ){
         int port = (*listOfNodes)[a]; 
+        printf("--- pinging node %d\n",port);
         HttpClient client("localhost:"+to_string(port));
         try {
             auto req = client.request("GET", "/latestchain");
@@ -57,10 +58,28 @@ void sendNewChain(const vector<int> *listOfNodes, string json){
     printf("Sending new chain to network....\n");
     for ( int a = 0; a < (*listOfNodes).size(); a++ ){
         int port = (*listOfNodes)[a]; 
-        printf("--- sending to node %d",port);
-        HttpClient client("localhost:"+to_string(port));
+        printf("--- sending to node %d\n",port);
+        HttpClient client("localhost:" + to_string(port));
         try {
             auto req = client.request("POST", "/newchain",json);
+            cout << "Node " << port << " Reponse: " << req->content.string() << endl;
+        }
+        catch(const SimpleWeb::system_error &e) {
+            cerr << "Client request error: " << e.what() << endl;
+        }
+    }
+}
+
+void addSelfToNetwork(const vector<int> *listOfNodes,int port) {
+    printf("Sending port to all nodes\n");
+    json j;
+    j["port"] = port;
+    for ( int a = 0; a < (*listOfNodes).size(); a++ ){
+        int port = (*listOfNodes)[a]; 
+        printf("--- sending port to node %d\n",port);
+        HttpClient client("localhost:"+to_string(port));
+        try {
+            auto req = client.request("POST","/addnode",j.dump(3));
             cout << "Node " << port << " Reponse: " << req->content.string() << endl;
         }
         catch(const SimpleWeb::system_error &e) {
@@ -96,12 +115,13 @@ int main() {
         scanf("%s",otherPorts);
         stringstream ss(otherPorts);
         int i;
-            while (ss >> i)
-            {
-                listOfNodes.push_back(i);
-                if (ss.peek() == ',' || ss.peek() == ' ')
-                    ss.ignore();
-            }
+        while (ss >> i)
+        {
+            listOfNodes.push_back(i);
+            if (ss.peek() == ',' || ss.peek() == ' ')
+                ss.ignore();
+        }
+        addSelfToNetwork(&listOfNodes,server.config.port);
         json chain = getChainFromNodes(&listOfNodes);
         //skips first block - same genesis block across all nodes
         for (int a = 1; a <chain["length"].get<int>(); a++ ){
@@ -115,21 +135,33 @@ int main() {
     }
 
     // SERVER INITIALIZATION
-
+    server.resource["^/addnode$"]["POST"] = [&listOfNodes](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+        printf("POST /addnode --- New Node adding to network....\n");
+        try {
+            json content = json::parse(request->content);
+            int port = content["port"].get<int>();
+            listOfNodes.push_back(port);
+            response->write("Added You to our List");
+        }
+        catch(const exception &e) {
+            *response << "HTTP/1.1 400 Bad Request\r\nContent-Length: " << strlen(e.what()) << "\r\n\r\n" << e.what();
+        }
+    };
     server.resource["^/latestchain$"]["GET"] = [&bc](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
         printf("GET /latestchain --- Sending BlockChain....\n");
         response->write(bc.toJSON());
     };
     server.resource["^/newchain$"]["POST"] = [&bc](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+        cout << "POST /newchain --- Node in Network sent new chain\n";
         try {
-            cout << "POST /newchain ...\n";
             json content = json::parse(request->content);
             if (content["length"].get<int>() > bc.getNumOfBlocks()){
-                cout << "response length" << content["length"].get<int>();
-                cout << "bc length" << bc.getNumOfBlocks();
                 bc.replaceChain(content);
-                response->write("Replaced Chain");
+                cout << resquest
+                printf("Replaced current chain with new one");
+                response->write("Replaced Chain\n");
             }
+            printf("Chain was not replaced -- sent chain had same size")
             response->write("Same Chain Size -- invalid");
         }
         catch(const exception &e) {
@@ -138,7 +170,9 @@ int main() {
     };
 
     server.on_error = [](shared_ptr<HttpServer::Request> /*request*/, const SimpleWeb::error_code & ec) {
-        cout << "SERVER ERROR: " << ec << endl;
+        if (ec.message() != "End of file") {
+            cout << "SERVER ERROR: " << ec.message() << endl;
+        }
       };
     printf("Starting server at %d",server.config.port);
 
