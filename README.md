@@ -13,7 +13,7 @@ And unfortunately, everything is stored in memory and is deleted when program qu
 My first implementation used WebSockets but I changed to using web servers for each node because peer-to-peer would require setting up "clients" for each and every node. 
 
 So instead, I make HTTP requests to connect to nodes to the network
-#### For this to work we need endpoints to: 
+#### For this to work we need to: 
 - Keep track of nodes in the network
 - Get the latest chains from every node 
 - Send out your chain to the network when a new block is added
