@@ -7,6 +7,9 @@
 #include <memory>
 #include <stdexcept>
 
+#include "json.hh"
+using json = nlohmann::json;
+
 class Block {
     public:
         Block(int index, string prevHas, string hash, string nonce, vector<string> data);
@@ -16,6 +19,7 @@ class Block {
         vector<string> getData(void);
 
         void toString(void);
+        string toJSON(void);
     private:
         int index;
         string previousHash;
@@ -53,11 +57,20 @@ vector<string> Block::getData(void){
 void Block::toString(void) {
     string dataString;
     for (int i=0; i < data.size(); i++)
-        dataString = data[i];
+        dataString += data[i] + ", ";
     printf("\n-------------------------------\n");
     printf("Block %d\nHash: %s\nPrevious Hash: %s\nContents: %s",
         index,this->blockHash.c_str(),this->previousHash.c_str(),dataString.c_str());
     printf("\n-------------------------------\n");
+}
+string Block::toJSON(void) {
+    json j;
+    j["index"] = this->index;
+    j["hash"] = this->blockHash;
+    j["previousHash"] = this->previousHash;
+    j["nonce"] = this->nonce;
+    j["data"] = this->data;
+    return j.dump();
 }
 
 #endif

@@ -9,29 +9,35 @@
 #include "common.h"
 #include "BlockChain.h"
 
-#include "client_ws.hpp"
-#include "server_ws.hpp"
+#include "json.hh"
+using json = nlohmann::json;
 
 using namespace std;
 
-using WsServer = SimpleWeb::SocketServer<SimpleWeb::WS>;
-using WsClient = SimpleWeb::SocketClient<SimpleWeb::WS>;
+#define BOOST_SPIRIT_THREADSAFE
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+
+#include "client_http.hpp"
+#include "server_http.hpp"
+
+using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
+using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
 /*
 Hash header: index + prevHash + merkleRoot(data) + nonce
 */
 
-
-
 int main() {
     printf("Welcome! To quit-> Control c \n");
-    WsServer server;
+    HttpServer server;
+
     int port;
     printf("Enter port: ");
     scanf("%d",&port); 
+    server.config.port = port; //server port
     
-    
-    
+    vector<int> listOfNodes; //vector of ports of nodes
     
     // BLOCK CHAIN INITIALIZATION
     
@@ -49,22 +55,35 @@ int main() {
         while ( tempInt == -1 ) {
             printf("Enter ports of nodes in network(no spaces): ");
             if (scanf("%d",&otherPort) == 1) 
-                createClient(otherPort,server.config.port);
+                listOfNodes.push_back(otherPort);
             else 
                 break;
-            
         }
     }
+
+    // SERVER INITIALIZATION
+
+    // server.resource["^/latestchain$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+        
+        
+    //   };
+
+
+
+
+    //COMMAND LINE INTERFACE
+
     for ( int i = 0; i < 20; i++ ) {
         vector<string> v;
         int temp;
         printf("\n(1) Look at Blocks \n(2) Add block\n");
-        scanf("%d",&temp);
-        if (temp == 1){
+        int valid = scanf("%d",&temp);
+        if ( (valid == 1) && (temp == 1)){
             printf("What Block do you want to look at? ");
             scanf("%d",&temp);
             try {
                 bc.getBlock(temp).toString();
+                cout << bc.getBlock(temp).toJSON();
             }
             catch (const exception& e){
                 cout << e.what() << "\n" << endl;
