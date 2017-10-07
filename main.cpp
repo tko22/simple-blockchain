@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <memory>
@@ -23,6 +24,34 @@ using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 /*
 Hash header: index + prevHash + merkleRoot(data) + nonce
 */
+json getChainFromNodes(vector<int> *listOfNodes){
+    vector<string> vect;
+    for ( int a = 0; a < (*listOfNodes).size(); a++ ){
+        int port = (*listOfNodes)[a]; 
+        HttpClient client("localhost:"+to_string(port));
+        try {
+            auto req = client.request("GET", "/latestchain");
+            vect.push_back(req->content.string());
+        }
+        catch(const SimpleWeb::system_error &e) {
+            cerr << "Client request error: " << e.what() << endl;
+        }
+    }
+
+    //find biggest blockchain
+    json biggest_bc = json::parse(vect[0]);
+    int max = 0;
+    for (int i =0; i < vect.size(); i++) {
+        auto json_data = json::parse(vect[i]);
+        if ( max < json_data["length"].get<int>() ){
+            max = json_data["length"].get<int>();
+            biggest_bc = json_data;
+        }
+    }
+    return biggest_bc;
+    
+}
+
 
 int main() {
     printf("Welcome! To quit-> Control c \n");
@@ -44,29 +73,40 @@ int main() {
     if (ch == 'y'){
         bc = BlockChain(0);
     }
+    else if(ch =='n'){
+        bc = BlockChain(0);
+        char otherPorts[50];
+        printf("Enter ports of nodes in network(with commas in between): ");
+        scanf("%s",otherPorts);
+        stringstream ss(otherPorts);
+        int i;
+            while (ss >> i)
+            {
+                listOfNodes.push_back(i);
+                if (ss.peek() == ',' || ss.peek() == ' ')
+                    ss.ignore();
+            }
+        json chain = getChainFromNodes(&listOfNodes);
+        //skips first block - same genesis block across all nodes
+        for (int a = 1; a <chain["length"].get<int>(); a++ ){
+            auto block = chain["data"][a];
+            vector<string> data = block["data"].get<vector<string> >();
+            bc.addBlock(block["index"],block["previousHash"],block["hash"],block["nonce"],data);
+        } 
+    }
     else {
-        bc = BlockChain();
-        int otherPort;
-        int tempInt = -1;
-        while ( tempInt == -1 ) {
-            printf("Enter ports of nodes in network(no spaces): ");
-            if (scanf("%d",&otherPort) == 1) 
-                listOfNodes.push_back(otherPort);
-            else 
-                break;
-        }
+        return 0;
     }
 
     // SERVER INITIALIZATION
 
     server.resource["^/latestchain$"]["GET"] = [&bc](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-        stringstream stream;
+        printf("GET /latestchain --- Sending BlockChain....\n");
         response->write(bc.toJSON());
-        // response->write("hjello");
     };
 
     server.on_error = [](shared_ptr<HttpServer::Request> /*request*/, const SimpleWeb::error_code & ec) {
-        cout << ec << endl;
+        cout << "SERVER ERROR: " << ec << endl;
       };
     printf("Starting server at %d",server.config.port);
 

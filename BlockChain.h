@@ -36,7 +36,6 @@ BlockChain::BlockChain(int genesis ){
         this -> blockchain.push_back(std::make_unique<Block>(0,string("00000000000000"),hash_nonce_pair.first,hash_nonce_pair.second,v));
         printf("Created blockchain!\n");
     }
-    
 }
 
 Block BlockChain::getBlock(int index) {
@@ -54,7 +53,6 @@ int BlockChain::getNumOfBlocks(void) {
 
 int BlockChain::addBlock(int index, string prevHash, string hash, string nonce, vector<string> &merkle) {
     string header = to_string(index) + prevHash + getMerkleRoot(merkle) + nonce;
-    cout << header;
     if ( (!sha256(header).compare(hash)) && (hash.substr(0,2) == "00" ) && (index == blockchain.size())) {
         printf("\nBlock hashes match --- Adding Block %s \n",hash.c_str());
         this->blockchain.push_back(std::make_unique<Block>(index,prevHash,hash,nonce,merkle));
@@ -70,8 +68,9 @@ string BlockChain::getLatestBlockHash(void) {
 
 string BlockChain::toJSON() {
     json j;
+    j["length"] = this->blockchain.size();
     for (int i = 0; i < this->blockchain.size(); i++){
-        j["data"][to_string(this->blockchain[i]->getIndex())] = this->blockchain[i]->toJSON();
+        j["data"][this->blockchain[i]->getIndex()] = this->blockchain[i]->toJSON();
     }
     return j.dump(3);
 }
