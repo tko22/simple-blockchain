@@ -8,6 +8,9 @@
 #include <memory>
 #include <stdexcept>
 
+#include "json.hh"
+using json = nlohmann::json;
+
 class BlockChain {
 public:
     BlockChain(int genesis  = 1 );
@@ -16,7 +19,8 @@ public:
     int getNumOfBlocks(void);
     int addBlock(int index, string prevHash, string hash, string nonce, vector<string> &merkle);
     string getLatestBlockHash(void);
-    void toString(void);
+    // void toString(void);
+    string toJSON(void);
 private:
     vector<unique_ptr<Block> > blockchain;
 };
@@ -62,6 +66,14 @@ int BlockChain::addBlock(int index, string prevHash, string hash, string nonce, 
 
 string BlockChain::getLatestBlockHash(void) {
     return this->blockchain[blockchain.size()-1]->getHash();
+}
+
+string BlockChain::toJSON() {
+    json j;
+    for (int i = 0; i < this->blockchain.size(); i++){
+        j["data"][to_string(this->blockchain[i]->getIndex())] = this->blockchain[i]->toJSON();
+    }
+    return j.dump(3);
 }
 
 #endif

@@ -61,7 +61,7 @@ int main() {
 
     server.resource["^/latestchain$"]["GET"] = [&bc](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
         stringstream stream;
-        response->write(bc.getBlock(0).toJSON());
+        response->write(bc.toJSON());
         // response->write("hjello");
     };
 
@@ -74,7 +74,6 @@ int main() {
         // Start server
         server.start();
     });
-    cout << bc.getBlock(0).toJSON();
     
     //COMMAND LINE INTERFACE
 
@@ -94,7 +93,7 @@ int main() {
                 cout << e.what() << "\n" << endl;
             }
         }
-        else{
+        else if (temp == 2){
             char tmp[201];
             printf("\nADDING BLOCKS!\nEnter your message: ");
             scanf("%200s",tmp);

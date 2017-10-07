@@ -19,7 +19,7 @@ class Block {
         vector<string> getData(void);
 
         void toString(void);
-        string toJSON(void);
+        json toJSON(void);
     private:
         int index;
         string previousHash;
@@ -63,14 +63,14 @@ void Block::toString(void) {
         index,this->blockHash.c_str(),this->previousHash.c_str(),dataString.c_str());
     printf("\n-------------------------------\n");
 }
-string Block::toJSON(void) {
+json Block::toJSON(void) {
     json j;
     j["index"] = this->index;
     j["hash"] = this->blockHash;
     j["previousHash"] = this->previousHash;
     j["nonce"] = this->nonce;
     j["data"] = this->data;
-    return j.dump();
+    return j;
 }
 
 #endif
