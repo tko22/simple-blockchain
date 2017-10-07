@@ -20,39 +20,6 @@ using WsClient = SimpleWeb::SocketClient<SimpleWeb::WS>;
 /*
 Hash header: index + prevHash + merkleRoot(data) + nonce
 */
-void createClient(int port) {
-    WsClient client("localhost:"+ to_string(port) + "/echo");
-    client.on_message = [](shared_ptr<WsClient::Connection> connection, shared_ptr<WsClient::Message> message) {
-      auto message_str = message->string();
-    
-      cout << "Client: Message received: \"" << message_str << "\"" << endl;
-    
-      cout << "Client: Sending close connection" << endl;
-      connection->send_close(1000);
-    };
-    
-    client.on_open = [](shared_ptr<WsClient::Connection> connection) {
-      cout << "Client: Opened connection" << endl;
-    
-      string message = "Hello";
-      cout << "Client: Sending message: \"" << message << "\"" << endl;
-    
-      auto send_stream = make_shared<WsClient::SendStream>();
-      *send_stream << message;
-      connection->send(send_stream);
-    };
-    
-    client.on_close = [](shared_ptr<WsClient::Connection> /*connection*/, int status, const string & /*reason*/) {
-      cout << "Client: Closed connection with status code " << status << endl;
-    };
-    
-    // See http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html, Error Codes for error code meanings
-    client.on_error = [](shared_ptr<WsClient::Connection> /*connection*/, const SimpleWeb::error_code &ec) {
-      cout << "Client: Error: " << ec << ", error message: " << ec.message() << endl;
-    };
-    client.start()
-    printf("Created client connecting to Port %d", int);
-}
 
 
 
@@ -62,51 +29,9 @@ int main() {
     int port;
     printf("Enter port: ");
     scanf("%d",&port); 
-    server.config.port = port;
     
-    auto &echo = server.endpoint["^/blockchain/?$"];
     
-    echo.on_message = [](shared_ptr<WsServer::Connection> connection, shared_ptr<WsServer::Message> message) {
-        auto message_str = message->string();
-        
-        cout << "Server: Message received: \"" << message_str << "\" from " << connection.get() << endl;
-        
-        cout << "Server: Sending message \"" << message_str << "\" to " << connection.get() << endl;
-        
-        auto send_stream = make_shared<WsServer::SendStream>();
-        *send_stream << message_str;
-        // connection->send is an asynchronous function
-        connection->send(send_stream, [](const SimpleWeb::error_code &ec) {
-            if(ec) {
-                cout << "Server: Error sending message. " <<
-                // See http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html, Error Codes for error code meanings
-                "Error: " << ec << ", error message: " << ec.message() << endl;
-            }
-        });
-        
-        // Alternatively, using a convenience function:
-        // connection->send(message_str, [](const SimpleWeb::error_code & /*ec*/) { /*handle error*/ });
-    };
     
-    echo.on_open = [](shared_ptr<WsServer::Connection> connection) {
-        cout << "Server: Opened connection " << connection.get() << endl;
-    };
-    
-    // See RFC 6455 7.4.1. for status codes
-    echo.on_close = [](shared_ptr<WsServer::Connection> connection, int status, const string & /*reason*/) {
-        cout << "Server: Closed connection " << connection.get() << " with status code " << status << endl;
-    };
-    
-    // See http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html, Error Codes for error code meanings
-    echo.on_error = [](shared_ptr<WsServer::Connection> connection, const SimpleWeb::error_code &ec) {
-        cout << "Server: Error in connection " << connection.get() << ". "
-        << "Error: " << ec << ", error message: " << ec.message() << endl;
-    };
-    thread server_thread([&server]() {
-        // Start WS-server
-        server.start();
-    });
-    cout << "Starting WebSocket Server at " << server.config.port << endl; 
     
     // BLOCK CHAIN INITIALIZATION
     
@@ -120,9 +45,15 @@ int main() {
     else {
         bc = BlockChain();
         int otherPort;
-        printf("Enter ports of nodes in network(no spaces): ");
-        scanf("%d",&otherPort);
-        createClient(8000);
+        int tempInt = -1;
+        while ( tempInt == -1 ) {
+            printf("Enter ports of nodes in network(no spaces): ");
+            if (scanf("%d",&otherPort) == 1) 
+                createClient(otherPort,server.config.port);
+            else 
+                break;
+            
+        }
     }
     for ( int i = 0; i < 20; i++ ) {
         vector<string> v;
@@ -147,6 +78,7 @@ int main() {
             printf("Entered '%s' into block\n",str.c_str());
             v.push_back(str);
 
+            
             int in;
             printf("Press any number to add block to blockchain: ");
             scanf("%d",&in);
@@ -163,8 +95,6 @@ int main() {
             }
         }
     }
-        
-    
 
     // bc.addBlock(0,string("00000000000000"),string("003d9dc40cad6b414d45555e4b83045cfde74bcee6b09fb42536ca2500087fd9"),string("46"),v);
     printf("\n");
