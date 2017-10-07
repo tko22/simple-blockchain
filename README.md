@@ -1,20 +1,35 @@
 # simple-blockchain
 My implementation of a blockchain in C++ I created for fun :)
-Follows some Bitcoin design choices including using SHA-256 to hash headers and blocks, merkle trees, and mining WoS. 
-- Uses C++14 and OpenSSL library
-
-### Peer-to-Peer coming soon!
+Follows some Bitcoin design principles including a peer-to-peer network, SHA-256 to hash headers and blocks, merkle trees, and mining WoS. 
+#### Requirements
+- Uses C++14, OpenSSL library, Simple-Web-Server, and a [JSON library](https://github.com/nlohmann/json)
 
 Includes a Command line interface that allows you to view blockchains at different indices and add new blocks. You 
-can do that 20 times until it automatically quits -> can change that. You can control-c to quit too. 
+can do that 20 times until it automatically quits -> you can change that. Control-c to quit. 
 
-And unfortunately, everything is stored in memory and is deleted on quit.
+And unfortunately, everything is stored in memory and is deleted when program quits.
+
+## Peer-to-Peer Network
+My first implementation used WebSockets but I changed to using web servers for each node because peer-to-peer would require setting up "clients" for each and every node. 
+
+So instead, I make HTTP requests to connect to nodes to the network
+#### For this to work we need endpoints to: 
+- Keep track of nodes in the network
+- Get the latest chains from every node 
+- Send out your chain to the network when a new block is added
+
+#### Conflicts in different chains 
+There can only be one explicit set of blocks in the chain at a given time. If there are conflicts, when the chains at different nodes have the same size but have different blocks, the chain that has the longest number of blocks is chosen. 
+
+So if some other node sends in a new chain that's longer than yours -> your chain is replaced 
+Note: this was a simple implementation and thus, it replaces the entire chain except for the genesis block. For future improvements, each node should check the new chain with other nodes before it is added and entire nodes shouldn't be sent out. 
 
 ## BlockChain Class
 #### Private Variables: 
 - blockchain(vector<unique_ptr<Block> >): vector of smart pointers to Block objects
 
 Genesis Block is created during intialization.
+#### Validating the integrity of blocks
 Every time you want to add a block to the blockchain, you will need to provide it: 
 
 `int index, string prevHash, string hash, string nonce, vector<string> &merkle`
@@ -23,17 +38,15 @@ Every time you want to add a block to the blockchain, you will need to provide i
 - nonce: self-explantory
 - merkle: vector holding in the data of the block
 
-It will then check whether you have the correct hash(it rehashes it), if you have "00" in front, and whether your index is correct.
+It will then check whether you have the correct hash(it rehashes the information given), if you have "00" in front, and whether your index is correct.
 
 Note: this is the only way to add to the blockchain.
-
 
 ## Mining
 (I made it very simple because I didn't want to spend much processing power) - use findHash() to get hash and nonce
 
 first two characters of the hash must be 0
 - e.g. `003d9dc40cad6b414d45555e4b83045cfde74bcee6b09fb42536ca2500087fd9` works 
-
 
 ## Block 
 Hash header: index + prevHash + merkleRoot(data) + nonce
@@ -57,4 +70,5 @@ For a block to be immutable, its properties are private and there are only metho
 
 
 
+### Author
 tk2@illinois.edu
