@@ -14,10 +14,6 @@ using json = nlohmann::json;
 
 using namespace std;
 
-#define BOOST_SPIRIT_THREADSAFE
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-
 #include "client_http.hpp"
 #include "server_http.hpp"
 
@@ -63,14 +59,23 @@ int main() {
 
     // SERVER INITIALIZATION
 
-    // server.resource["^/latestchain$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-        
-        
-    //   };
+    server.resource["^/latestchain$"]["GET"] = [&bc](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+        stringstream stream;
+        response->write(bc.getBlock(0).toJSON());
+        // response->write("hjello");
+    };
 
+    server.on_error = [](shared_ptr<HttpServer::Request> /*request*/, const SimpleWeb::error_code & ec) {
+        cout << ec << endl;
+      };
+    printf("Starting server at %d",server.config.port);
 
-
-
+    thread server_thread([&server]() {
+        // Start server
+        server.start();
+    });
+    cout << bc.getBlock(0).toJSON();
+    
     //COMMAND LINE INTERFACE
 
     for ( int i = 0; i < 20; i++ ) {
@@ -114,7 +119,7 @@ int main() {
             }
         }
     }
-
+    
     // bc.addBlock(0,string("00000000000000"),string("003d9dc40cad6b414d45555e4b83045cfde74bcee6b09fb42536ca2500087fd9"),string("46"),v);
     printf("\n");
     return 0;
