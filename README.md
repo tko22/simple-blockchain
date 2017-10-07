@@ -10,19 +10,20 @@ can do that 20 times until it automatically quits but you can change that. Contr
 And unfortunately, everything is stored in memory and is deleted when program quits.
 
 ## Peer-to-Peer Network
-My first implementation used WebSockets but I changed to using web servers for each node because peer-to-peer would require setting up "clients" for each and every node. 
+At first, I used WebSockets but a peer-to-peer system would require setting up a WS server and WS clients for each and every node. 
 
 So instead, I make HTTP requests to connect to nodes to the network
 #### For this to work we need to: 
 - Keep track of nodes in the network
-- Get the latest chains from every node 
+- Get the latest chains from every node -- to validate your chain & get up to date when a new node is added to the network
 - Send out your chain to the network when a new block is added
 
 #### Conflicts in different chains 
-There can only be one explicit set of blocks in the chain at a given time. If there are conflicts, when the chains at different nodes have the same size but have different blocks, the chain that has the longest number of blocks is chosen. 
+There can only be one explicit set of blocks in the chain at a given time. If there are conflicts(e.g. when the chains at different nodes have the same size but have different blocks), the longest chain is chosen. 
 
-So if some other node sends in a new chain that's longer than yours -> your chain is replaced 
-Note: this was a simple implementation and thus, it replaces the entire chain except for the genesis block. For future improvements, each node should check the new chain with other nodes before it is added and entire nodes shouldn't be sent out. 
+So if some other node sends in a new chain that's longer than yours, your chain is replaced.
+
+**Note:** this was a simple implementation and thus, it replaces the entire chain except for the genesis block. For future improvements, each node should check the new chain with other nodes before it is added and entire nodes shouldn't be sent out. 
 
 ## BlockChain Class
 #### Private Variables: 
