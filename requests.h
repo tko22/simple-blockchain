@@ -1,3 +1,4 @@
+//author: tko
 #ifndef REQUESTS_H
 #define REQUESTS_H
 
@@ -17,6 +18,15 @@ using namespace std;
 
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
+
+/* 
+ * Client request functions 
+*/
+/*
+ * gets the latest chain from the network and finds the longest one
+ * used when node initializes 
+ * Returns: JSON object of the blockchain
+*/ 
 json getChainFromNodes(const vector<int> *listOfNodes){
     printf("Pinging nodes for chains....\n");
     vector<string> vect;
@@ -47,6 +57,9 @@ json getChainFromNodes(const vector<int> *listOfNodes){
     
 }
 
+/*
+ * sends out the new blockchain to network
+*/
 void sendNewChain(const vector<int> *listOfNodes, string json){
     printf("Sending new chain to network....\n");
     for ( int a = 0; a < (*listOfNodes).size(); a++ ){
@@ -62,7 +75,10 @@ void sendNewChain(const vector<int> *listOfNodes, string json){
         }
     }
 }
-
+/*
+ * adds self to network
+ * called when node initializes - used so nodes could keep track of nodes in the network
+*/
 void addSelfToNetwork(const vector<int> *listOfNodes,int port) {
     printf("Sending port to all nodes\n");
     json j;

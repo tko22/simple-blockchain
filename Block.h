@@ -1,3 +1,4 @@
+//author: tko
 #ifndef BLOCK_H
 #define BLOCK_H
 
@@ -28,6 +29,7 @@ class Block {
         vector<string> data;
         // string getMerkleRoot(const vector<string> &merkle);
 };
+// Constructor 
 Block::Block(int index, string prevHash, string hash, string nonce, vector<string> data ) {
     printf("\nInitializing Block: %d ---- Hash: %s \n", index,hash.c_str());
     this -> previousHash = prevHash;
@@ -54,6 +56,7 @@ vector<string> Block::getData(void){
     return this -> data;
 }
 
+// Prints Block data 
 void Block::toString(void) {
     string dataString;
     for (int i=0; i < data.size(); i++)
@@ -63,6 +66,7 @@ void Block::toString(void) {
         index,this->blockHash.c_str(),this->previousHash.c_str(),dataString.c_str());
     printf("\n-------------------------------\n");
 }
+
 json Block::toJSON(void) {
     json j;
     j["index"] = this->index;

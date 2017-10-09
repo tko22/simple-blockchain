@@ -1,3 +1,4 @@
+//author: tko
 #ifndef BLOCKCHAIN_H
 #define BLOCKCHAIN_H
 
@@ -23,7 +24,7 @@ public:
     string toJSON(void);
     int replaceChain(json chain);
 private:
-    vector<unique_ptr<Block> > blockchain;
+    vector<unique_ptr<Block> > blockchain; //vector that is the blockchain
 };
 
 // If integer passed into constructor is 0, it the first node and creates the genesis block
@@ -38,7 +39,7 @@ BlockChain::BlockChain(int genesis ){
         printf("Created blockchain!\n");
     }
 }
-
+// Gets block based on the index
 Block BlockChain::getBlock(int index) {
     for ( int i = 0; i <blockchain.size(); i++ ){
         if (blockchain[i]->getIndex() == index) {
@@ -48,10 +49,12 @@ Block BlockChain::getBlock(int index) {
     throw invalid_argument("Index does not exist.");
 }
 
+// returns number of blocks
 int BlockChain::getNumOfBlocks(void) {
     return this -> blockchain.size();
 }
 
+// checks whether data fits with the right hash -> add block
 int BlockChain::addBlock(int index, string prevHash, string hash, string nonce, vector<string> &merkle) {
     string header = to_string(index) + prevHash + getMerkleRoot(merkle) + nonce;
     if ( (!sha256(header).compare(hash)) && (hash.substr(0,2) == "00" ) && (index == blockchain.size())) {
@@ -59,14 +62,16 @@ int BlockChain::addBlock(int index, string prevHash, string hash, string nonce, 
         this->blockchain.push_back(std::make_unique<Block>(index,prevHash,hash,nonce,merkle));
         return 1;
     }
-    cout << "\nHash doesn't match criteria\n";
+    cout << "Hash doesn't match criteria\n";
     return 0;
 }
 
+// returns hash of the latest block, used for finding the previousHash when mining new block
 string BlockChain::getLatestBlockHash(void) {
     return this->blockchain[blockchain.size()-1]->getHash();
 }
 
+// returns JSON string of JSON - used to send to network
 string BlockChain::toJSON() {
     json j;
     j["length"] = this->blockchain.size();
@@ -76,6 +81,7 @@ string BlockChain::toJSON() {
     return j.dump(3);
 }
 
+// replaces Chain with new chain represented by a JSON, used when node sends new blockchain
 int BlockChain::replaceChain(json chain) {
     //remove all blocks except for the first block
     while (this->blockchain.size() > 1){
