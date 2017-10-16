@@ -7,7 +7,7 @@ Follows some Bitcoin design principles including a peer-to-peer network, SHA-256
 Includes a Command line interface that allows you to view blockchains at different indices and add new blocks. You 
 can do that 20 times until it automatically quits but you can change that. Control-c to quit. 
 
-And unfortunately, everything is stored in memory and is deleted when program quits.
+And unfortunately, everything is stored in memory and is deleted when program quits. 
 
 ## Peer-to-Peer Network
 At first, I used WebSockets but a peer-to-peer system would require setting up a WS server and WS clients for each and every node. 
@@ -23,7 +23,7 @@ There can only be one explicit set of blocks in the chain at a given time. If th
 
 So if some other node sends in a new chain that's longer than yours, your chain is replaced.
 
-**Note:** this was a simple implementation and thus, it replaces the entire chain except for the genesis block. For future improvements, each node should check the new chain with other nodes before it is added and entire nodes shouldn't be sent out. 
+**Note:** this was a simple implementation and thus, it replaces the entire chain except for the genesis block. For future improvements, each node should check the new chain with other nodes before it is added and entire nodes shouldn't be sent out. I didn't have access to other computers in the same network, so the nodes are connected through different ports inside your computer. 
 
 ## BlockChain Object
 #### Private Variables: 
