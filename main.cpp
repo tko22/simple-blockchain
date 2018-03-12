@@ -6,11 +6,11 @@
 #include <memory>
 #include <stdexcept>
 
-#include "hash.h"
-#include "Block.h"
-#include "common.h"
-#include "BlockChain.h"
-#include "requests.h"
+#include "hash.hpp"
+#include "Block.hpp"
+#include "common.hpp"
+#include "BlockChain.hpp"
+#include "requests.hpp˜"
 
 #include "json.hh"
 using json = nlohmann::json;
