@@ -1,3 +1,4 @@
 .vscode/
 main
 a.out
+.DS_Store
