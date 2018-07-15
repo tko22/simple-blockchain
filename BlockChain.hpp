@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <string>
-#include "hash.h"
+#include "hash.hpp"
 #include <vector>
 #include <memory>
 #include <stdexcept>

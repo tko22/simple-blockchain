@@ -1,4 +1,6 @@
 .vscode/
 main
-a.out
+*.out
+*.o
 .DS_Store
+**/.DS_Store
