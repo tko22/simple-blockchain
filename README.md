@@ -1,96 +1,72 @@
-# simple-blockchain
+# Simple Blockchain
 
-My implementation of a blockchain in C++ I created for fun :)
+This is implementation of a blockchain in C++, created as a fun educational project.
 
-_Note that this was written before knowing more about distributed system concepts. Use at your own discretion._
+_Note: This project was developed with a basic understanding of distributed system concepts. It's primarily for learning purposes and not optimized for production use._
 
-Follows some Bitcoin design principles including a peer-to-peer network, SHA-256 to hash headers and blocks, merkle trees, and "mining"(more on that below).
+This blockchain model incorporates elements from Bitcoin's design, including a peer-to-peer network architecture, SHA-256 for hashing, Merkle trees, and a simplified form of "mining".
 
-#### Requirements
+### Requirements
 
-- Uses C++14, OpenSSL library, Simple-Web-Server, and a [JSON library](https://github.com/nlohmann/json)
+- **C++17**: Ensure your compiler supports at least C++17.
+- **OpenSSL Library**: For SHA-256 hashing.
+- **Simple-Web-Server**: For handling HTTP requests between nodes.
+- **JSON Library**: [nlohmann/json](https://github.com/nlohmann/json) for data serialization.
 
-Includes a Command line interface that allows you to view blockchains at different indices and add new blocks. You
-can do that 20 times until it automatically quits but you can change that. Control-c to quit.
-
-And unfortunately, everything is stored in memory and is deleted when program quits.
+The system includes a Command Line Interface (CLI) that allows interaction with the blockchain, such as viewing and adding blocks. The CLI permits up to 20 operations before it exits automatically, but this can be adjusted as needed. Use Control-C to quit the program at any time. Note that all data is held in memory and will be lost when the program is terminated.
 
 ## Peer-to-Peer Network
 
-At first, I used WebSockets but a peer-to-peer system would require setting up a WS server and WS clients for each and every node.
+Initially considered using WebSockets, I opted for HTTP requests due to the simplicity of integrating HTTP servers and clients without the overhead of setting up WebSocket servers and clients for each node.
 
-So instead, I make HTTP requests to connect to nodes to the network
+### Networking Details:
 
-#### For this to work we need to:
+- **Node Tracking**: Maintains a list of other nodes in the network.
+- **Chain Syncing**: Retrieves the latest blockchain from every node to validate and update the local chain when a new node joins.
+- **Chain Broadcasting**: Distributes the current blockchain to other nodes whenever a new block is added.
 
-- Keep track of nodes in the network
-- Get the latest chains from every node -- to validate your chain & get up to date when a new node is added to the network
-- Send out your chain to the network when a new block is added
+### Conflict Resolution
 
-#### Conflicts in different chains
+The blockchain enforces a singular, authoritative chain at any time. Conflicts (e.g., when two nodes have chains of the same length but with different blocks) are resolved by adopting the longer chain. If a received chain is longer than the current chain, the local chain is updated accordingly.
 
-There can only be one explicit set of blocks in the chain at a given time. If there are conflicts(e.g. when the chains at different nodes have the same size but have different blocks), the longest chain is chosen.
+**Note**: This implementation simplifies network interactions and assumes all nodes are on the same local network but listening on different ports.
 
-So if some other node sends in a new chain that's longer than yours, your chain is replaced.
+## Blockchain Object
 
-**Note:** this was a simple implementation and thus, it replaces the entire chain except for the genesis block. For future improvements, each node should check the new chain with other nodes before it is added and entire nodes shouldn't be sent out. I didn't have access to other computers in the same network, so the nodes are connected through different ports inside your computer.
+### Components:
 
-## BlockChain Object
+- **Blocks**: Managed via a vector of unique pointers to `Block` objects.
+- **Genesis Block**: Automatically created upon initialization.
 
-#### Private Variables:
+### Block Validation
 
-- blockchain(vector<unique_ptr<Block> >): vector of smart pointers to Block objects
+To add a block, you must provide:
+- `index`: Block position in the chain.
+- `prevHash`: Hash of the preceding block.
+- `hash`: Computed SHA-256 hash of the new block.
+- `nonce`: A nonce that, combined with the above details, leads to a hash with specific characteristics (e.g., starting with "00").
+- `merkle`: Vector of strings containing the block's data.
 
-Genesis Block is created during intialization.
+Each addition is validated against these criteria to ensure chain integrity.
 
-#### Validating the integrity of blocks
+## Simplified Mining (Proof of Concept)
 
-Every time you want to add a block to the blockchain, you will need to provide it:
-
-`int index, string prevHash, string hash, string nonce, vector<string> &merkle`
-
-- index: index of the block
-- prevHash: hash of the previous block
-- nonce: self-explantory
-- merkle: vector holding in the data of the block
-
-It will then check whether you have the correct hash(it rehashes the information given), if you have "00" in front, and whether your index is correct.
-
-Note: this is the only way to add to the blockchain.
-
-## Mining for I guess... Proof of Stake
-
-(I made it very simple because I didn't want to spend much processing power so it's honestly not proof of stake but I just added it in for fun) - use findHash() to get hash and nonce
-
-first two characters of the hash must be 0
-
-- e.g. `003d9dc40cad6b414d45555e4b83045cfde74bcee6b09fb42536ca2500087fd9` works
+This version includes a basic "mining" process using `findHash()` to generate a valid hash and nonce. The hash must start with "00" to be accepted.
 
 ## Block Object
 
-Hash header: index + prevHash + merkleRoot(data) + nonce
+### Structure:
 
-#### Private Variables:
+- **Index**: Position of the block in the chain.
+- **Data**: Contents of the block, stored as a vector of strings.
+- **Hashes**: Includes both the previous and current block hashes.
+- **Nonce**: Used to calculate the current block's hash.
 
-- index
-- Data: vector of strings
-- previousHash
-- blockHash
-- nonce
+Blocks are designed to be immutable, with private properties only accessible through getter methods.
 
-For a block to be immutable, its properties are private and there are only methods that return them but not update them.
+## Utility Functions
 
-## Common Functions
+### Key Functions:
 
-#### getMerkleRoot(const vector<string> &merkle)
-
-- gets merkle root based on elements of a vector
-
-#### findHash(int index, string prevHash, vector<string> &merkle)
-
-- "Mining" part
-- finds hash and returns a std::pair of the hash found and nonce used to find it
-
-### Author
-
-tk2@illinois.edu
+- `getMerkleRoot(const vector<string>& merkle)`: Computes the Merkle root from block data.
+- `findHash(int index, string prevHash, vector<string>& merkle)`: Simulates the mining process to find a suitable hash and nonce.

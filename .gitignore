@@ -1,6 +1,2 @@
 .vscode/
-main
-*.out
-*.o
-.DS_Store
-**/.DS_Store
+build/
